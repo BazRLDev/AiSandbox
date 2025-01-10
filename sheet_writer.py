@@ -137,6 +137,25 @@ def ask_gemini(phrase):
 def formated_gemini_response_json(response_json):
     return [response_json['suggestions'][0]['prompt'], response_json['suggestions'][1]['prompt'], response_json['suggestions'][2]['prompt']]
 
+def generate_image(prompt):
+    genai.configure(api_key=GEMINI_API_KEY, transport='rest')
+    model = genai.GenerativeModel("gemini-pro-vision")
+    print(f"Attempting to generate image using prompt: {prompt}")
+    response = model.generate_content(
+        [prompt]
+    )
+
+    if response and response.parts and len(response.parts) > 0:
+        try:
+            image_data = response.parts[0].data
+            base64_image = base64.b64encode(image_data).decode("utf-8")
+            return base64_image
+        except Exception as e:
+            print(f"error in generate_image: {e}")
+    else:
+        print("Error: No image data returned")
+        return None
+
 def main():
     service = get_sheet_service()
     if not service:
